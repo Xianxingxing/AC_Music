@@ -12,6 +12,22 @@
 .swiftpm/
 migrate_working_dir/
 
+# --- Secrets, credentials & machine-only paths (do not commit) ---
+.env
+.env.*
+!.env.example
+**/secrets/
+*.pem
+*.p12
+*.mobileprovision
+# Android signing; see also android/.gitignore
+**/key.properties
+# SDK / Flutter path (any subfolder; android/local.properties is the usual one)
+**/local.properties
+
+# Personal IDE settings (may contain local paths)
+.vscode/
+
 # IntelliJ related
 *.iml
 *.ipr

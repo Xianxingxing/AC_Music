@@ -21,8 +21,6 @@
 
 ## 截图
 
-截图位于 `docs/screenshots/`（**JPG**），索引说明见 [docs/screenshots/README.md](docs/screenshots/README.md)。
-
 <p align="center">
   <img src="docs/screenshots/player_main.jpg" alt="主播放界面" width="720" /><br/>
   <sub>主播放 · <code>player_main.jpg</code></sub>
