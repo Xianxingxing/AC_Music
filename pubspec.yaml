@@ -1,0 +1,46 @@
+name: ac_music
+description: "AC_Music."
+publish_to: 'none'
+version: 1.0.2+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  dart_tags: ^0.4.1
+  file_picker: ^11.0.2
+  flutter:
+    sdk: flutter
+  http_server: ^1.0.0
+  just_audio: ^0.10.5
+  lpinyin: ^2.0.3
+  mime: ^1.0.6
+  path: ^1.9.1
+  path_provider: ^2.1.5
+  permission_handler: ^12.0.1
+  shared_preferences: ^2.5.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  macos:
+    generate: true
+  image_path: "lib/logo.png"
+  adaptive_icon_background: "#121625"
+  adaptive_icon_foreground: "lib/logo.png"
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: NotoSansSC
+      fonts:
+        - asset: assets/fonts/NotoSansCJKsc-Regular.otf
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Variable.ttf
