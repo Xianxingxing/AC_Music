@@ -57,6 +57,8 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
   static const String _playbackModePreferenceKey = 'playback_mode';
   static const String _fullscreenLyricsCoverEffectPreferenceKey =
       'fullscreen_lyrics_cover_effect_v1';
+  static const String _fullscreenLyricsHintSeenPreferenceKey =
+      'fullscreen_lyrics_hint_seen_v1';
   static const String _lanServerEnabledKey = 'lan_server_enabled';
   static const String _lanServerPortKey = 'lan_server_port';
   static const String _lanServerUserKey = 'lan_server_user';
@@ -102,6 +104,9 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
   bool _isQueueVisible = false;
   bool _isLyricsFullscreen = false;
   bool _showFullscreenOverlay = false;
+  /// 已看过操作蒙版；在 prefs 恢复前默认为 true，避免误显示。
+  bool _fullscreenLyricsHintSeen = true;
+  bool _showFullscreenLyricsFirstHint = false;
   final LanFileServer _lanServer = LanFileServer();
   bool _lanServerEnabled = false;
   int _lanServerPort = 8088;
@@ -166,6 +171,7 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
   Future<void> _bootstrapAfterLaunch() async {
     await _restorePlaybackMode();
     await _restoreFullscreenLyricsCoverEffect();
+    await _restoreFullscreenLyricsHintSeen();
     await _loadSavedScanFolders();
     await _restoreLastScanFolder();
     if (!mounted) {
@@ -370,6 +376,35 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
       _fullscreenLyricsCoverEffectPreferenceKey,
       _fullscreenLyricsCoverEffectEnabled,
     );
+  }
+
+  Future<void> _restoreFullscreenLyricsHintSeen() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final bool seen =
+        prefs.getBool(_fullscreenLyricsHintSeenPreferenceKey) ?? false;
+    if (!mounted) {
+      _fullscreenLyricsHintSeen = seen;
+      return;
+    }
+    setState(() {
+      _fullscreenLyricsHintSeen = seen;
+    });
+  }
+
+  Future<void> _persistFullscreenLyricsHintSeen() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_fullscreenLyricsHintSeenPreferenceKey, true);
+  }
+
+  void _dismissFullscreenLyricsHint() {
+    if (!_showFullscreenLyricsFirstHint) {
+      return;
+    }
+    setState(() {
+      _showFullscreenLyricsFirstHint = false;
+      _fullscreenLyricsHintSeen = true;
+    });
+    unawaited(_persistFullscreenLyricsHintSeen());
   }
 
   Future<int> _resolveLastPlayedSongIndex(List<_LocalSong> songs) async {
@@ -832,6 +867,16 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
       return KeyEventResult.ignored;
     }
     final LogicalKeyboardKey key = event.logicalKey;
+    if (_isLyricsFullscreen && _showFullscreenLyricsFirstHint) {
+      if (key == LogicalKeyboardKey.arrowUp ||
+          key == LogicalKeyboardKey.arrowDown ||
+          key == LogicalKeyboardKey.arrowLeft ||
+          key == LogicalKeyboardKey.arrowRight) {
+        return KeyEventResult.handled;
+      }
+      _dismissFullscreenLyricsHint();
+      return KeyEventResult.handled;
+    }
     if (key == LogicalKeyboardKey.escape ||
         key == LogicalKeyboardKey.goBack ||
         key == LogicalKeyboardKey.browserBack) {
@@ -1433,13 +1478,18 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
   }
 
   void _toggleLyricsFullscreen() {
+    final bool entering = !_isLyricsFullscreen;
     setState(() {
       _isLyricsFullscreen = !_isLyricsFullscreen;
       _showFullscreenOverlay = false;
       _isQueueVisible = false;
+      _showFullscreenLyricsFirstHint = false;
       _focusedControlIndex = 8;
       _lastIndexBySection[_FocusSection.controls] = 8;
       _setFocusedSection(_FocusSection.controls);
+      if (entering && !_fullscreenLyricsHintSeen) {
+        _showFullscreenLyricsFirstHint = true;
+      }
     });
   }
 
@@ -2750,6 +2800,10 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
                                                 behavior:
                                                     HitTestBehavior.translucent,
                                                 onTap: () {
+                                                  if (_showFullscreenLyricsFirstHint) {
+                                                    _dismissFullscreenLyricsHint();
+                                                    return;
+                                                  }
                                                   if (_showFullscreenOverlay ||
                                                       _isQueueVisible) {
                                                     return;
@@ -2760,6 +2814,9 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
                                                 },
                                                 onDoubleTapDown:
                                                     (TapDownDetails details) {
+                                                  if (_showFullscreenLyricsFirstHint) {
+                                                    return;
+                                                  }
                                                   if (_showFullscreenOverlay ||
                                                       _isQueueVisible) {
                                                     return;
@@ -2779,6 +2836,9 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
                                                 },
                                                 onVerticalDragEnd:
                                                     (DragEndDetails details) {
+                                                  if (_showFullscreenLyricsFirstHint) {
+                                                    return;
+                                                  }
                                                   if (_showFullscreenOverlay ||
                                                       _isQueueVisible) {
                                                     return;
@@ -2822,6 +2882,14 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
                                                 queueSongs: _queueSongs,
                                                 currentPlayingIndex:
                                                     _currentSongIndex,
+                                              ),
+                                            ),
+                                          if (_isLyricsFullscreen &&
+                                              _showFullscreenLyricsFirstHint)
+                                            Positioned.fill(
+                                              child: _FullscreenLyricsHintMask(
+                                                onDismiss:
+                                                    _dismissFullscreenLyricsHint,
                                               ),
                                             ),
                                         ],
@@ -2868,6 +2936,127 @@ class _TvMusicPlayerPageState extends State<TvMusicPlayerPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FullscreenLyricsHintMask extends StatelessWidget {
+  const _FullscreenLyricsHintMask({required this.onDismiss});
+
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onDismiss,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.62),
+        ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 920),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48),
+              child: Material(
+                color: TvColors.card,
+                elevation: 12,
+                borderRadius: TvRadii.panel,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(40, 36, 40, 32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.touch_app_rounded,
+                            color: TvColors.accent,
+                            size: 32,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '全屏歌词操作提示',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: TvColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+                      _hintLine(
+                        '上键',
+                        '唤出播放队列',
+                      ),
+                      const SizedBox(height: 16),
+                      _hintLine(
+                        '下键',
+                        '唤出底部控制浮窗',
+                      ),
+                      const SizedBox(height: 16),
+                      _hintLine(
+                        '双击左 / 右键',
+                        '切换上一曲 / 下一曲',
+                      ),
+                      const SizedBox(height: 28),
+                      Text(
+                        '按确定、返回或触摸空白处关闭',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: TvColors.textSecondary,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _hintLine(String keyLabel, String description) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: TvColors.panel,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: TvColors.panelBorder),
+          ),
+          child: Text(
+            keyLabel,
+            style: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w700,
+              color: TvColors.textPrimary,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              description,
+              style: TextStyle(
+                fontSize: 22,
+                height: 1.35,
+                color: TvColors.textPrimary.withValues(alpha: 0.92),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

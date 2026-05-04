@@ -21,20 +21,30 @@
 
 ## Screenshots · 截图
 
-> **English:** Place PNG files under `docs/screenshots/` using the filenames below so images render on GitHub.  
-> **中文：** 将同名 PNG 放入 `docs/screenshots/` 后，下列图片会在仓库页面正常显示；未放置前可能出现裂图，属正常。
+> **English:** Images live in `docs/screenshots/` (JPG). See [docs/screenshots/README.md](docs/screenshots/README.md) for the full list.  
+> **中文：** 截图位于 `docs/screenshots/`，格式为 **JPG**；完整文件说明见 [docs/screenshots/README.md](docs/screenshots/README.md)。
 
 <p align="center">
-  <img src="docs/screenshots/player_main.png" alt="AC Music player" width="720" /><br/>
-  <sub>主界面 / Main player · <code>docs/screenshots/player_main.png</code></sub>
+  <img src="docs/screenshots/player_main.jpg" alt="AC Music player" width="720" /><br/>
+  <sub>主播放 / Main player · <code>player_main.jpg</code></sub>
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/library_tv.png" alt="Library or TV UI" width="720" /><br/>
-  <sub>曲库或 TV 界面（可选）/ Library or TV (optional) · <code>docs/screenshots/library_tv.png</code></sub>
+  <img src="docs/screenshots/library_tv.jpg" alt="Library or TV UI" width="720" /><br/>
+  <sub>曲库 / TV / Library · <code>library_tv.jpg</code></sub>
 </p>
 
-See `docs/screenshots/README.md` for naming tips.
+<p align="center">
+  <img src="docs/screenshots/files_manager.jpg" alt="Files manager" width="360" />
+  <img src="docs/screenshots/search.jpg" alt="Search" width="360" /><br/>
+  <sub>文件管理 · 搜索 / Files · Search</sub>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/settings.jpg" alt="Settings" width="360" />
+  <img src="docs/screenshots/full_screen_lyrics.jpg" alt="Fullscreen lyrics" width="360" /><br/>
+  <sub>设置 · 全屏歌词 / Settings · Fullscreen lyrics</sub>
+</p>
 
 ---
 
