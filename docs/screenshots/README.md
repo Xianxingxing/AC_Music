@@ -1,6 +1,6 @@
 # 应用截图 / Screenshots
 
-本目录存放 **AC Music** 在 GitHub 与文档中使用的界面截图。根目录 [README.md](../../README.md) 的「截图」区会引用其中部分文件；以下清单与当前仓库内**实际存在的文件**一致（格式为 **JPG**）。
+本目录存放 **AC Music** 在 GitHub 与文档中使用的界面截图。根目录 [README.md](../../README.md)（中文）与 [README_EN.md](../../README_EN.md)（English）的截图区会引用下列文件；清单与仓库内**实际存在的文件**一致（格式为 **JPG**）。
 
 ## 文件清单 / File index
 
@@ -15,7 +15,7 @@
 
 ## 与根目录 README 的对应关系
 
-根 [README.md](../../README.md) 中目前用于首屏展示的建议引用为：
+根目录 [README.md](../../README.md)、[README_EN.md](../../README_EN.md) 中用于展示的建议引用为：
 
 - `player_main.jpg` — 主图一（主播放）
 - `library_tv.jpg` — 主图二（曲库 / TV）
@@ -26,7 +26,7 @@
 
 - **格式**：当前统一为 **JPG**；若更换为 PNG，请同步修改根目录 `README.md` 里所有 `docs/screenshots/*.png` 或 `*.jpg` 引用。
 - **尺寸**：宽度约 **720～1080 px** 即可，便于网页加载；保持横屏比例以符合 TV / 车机展示。
-- **命名**：请保持上表文件名，或更新本文件与 [README.md](../../README.md) 中的路径，避免 GitHub 上裂图。
+- **命名**：请保持上表文件名，或同步更新本文件与 [README.md](../../README.md)、[README_EN.md](../../README_EN.md) 中的路径，避免 GitHub 上裂图。
 
 ## 快速校验
 
